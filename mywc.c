@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include <getopt.h>
 
-#define VERSION_DESC    "@Copyright 2021 - Version 1.0 - MIT License Custom head software module. Developed by Batuhan Düzgün\n"
+#define VERSION_DESC    "@Copyright 2021 - Version 1.0 - MIT License Custom wc software module. Developed by Batuhan Düzgün\n"
 
 
 #define HELP_DESC       "****** HELP DOCUMENT *******\n" \
@@ -18,21 +18,21 @@
                         "wc programı seçeneksiz argüman verilmediğinde stdin dosyasından okuma yapmaktadır. Programın komut satırı argümanları şöyledir:\n" \
                         "                     \n" \
                         "- c ya da --bytes: Yalnızca dosyadaki byte sayısını yazdırır. Yazdırma şöyle yapılmalıdır:\n" \
-                        "<byte sayısı> 	<dosya ismi>\n" \
-                        "<byte sayısı> 	<dosya ismi>\n" \
-                        "<byte sayısı> 	<dosya ismi>\n" \
+                        "<byte sayısı>  <dosya ismi>\n" \
+                        "<byte sayısı>  <dosya ismi>\n" \
+                        "<byte sayısı>  <dosya ismi>\n" \
                         "...\n" \
                         "                     \n" \
                         "-l ya da --lines: Dosyada kaç satır bulunduğunu yazdırır. Satır sayısında \n ile bitmeyen son satır sayılmaz. Başka bir deyişle wc programı sonu '\n' ile biten satırları saymaktadır. Yazdırma şöyle yapılmaktadır:\n" \
-                        "<satır sayısı> 	<dosya ismi>\n" \
-                        "<satır sayısı> 	<dosya ismi>\n" \
-                        "<satır sayısı> 	<dosya ismi>\n" \
+                        "<satır sayısı>     <dosya ismi>\n" \
+                        "<satır sayısı>     <dosya ismi>\n" \
+                        "<satır sayısı>     <dosya ismi>\n" \
                         "...\n" \
                         "                     \n" \
                         "-L ya da --max-line-length: Dosya içerisindeki en uzun satırın karakter uzunluğunu yazdırır. Yazdırma şöyle yapılmalıdır:\n" \
-                        "<satırdaki karakter sayısı> 	<dosya ismi>\n" \
-                        "<satırdaki karakter sayısı> 	<dosya ismi>\n" \
-                        "<satırdaki karakter sayısı> 	<dosya ismi>\n" \
+                        "<satırdaki karakter sayısı>    <dosya ismi>\n" \
+                        "<satırdaki karakter sayısı>    <dosya ismi>\n" \
+                        "<satırdaki karakter sayısı>    <dosya ismi>\n" \
                         "                     \n" \
                         "-w ya da --words: Dosyadaki sözcük sayısını yazdırır. \n" \
                         "-- help: Yardım yazısını yazdırır:\n" \
@@ -52,6 +52,7 @@ int open_file(FILE **file, char *file_name);
 long find_line_count(FILE *file, char *file_name, long *max_line_length);
 long find_word_count(FILE *file, char *file_name);
 long find_character_count(FILE *file, char *file_name);
+void read_from_stdin();
 
 int main(int argc, char *argv[])
 {   
@@ -99,7 +100,7 @@ void run(int *argc, char *argv[], int *c_flag, int *l_flag, int *L_flag, int *w_
     {
         if( (*argc) == optind )
         {
-            // use stdin !!
+            read_from_stdin();
             return;
         }
 
@@ -156,6 +157,18 @@ void run(int *argc, char *argv[], int *c_flag, int *l_flag, int *L_flag, int *w_
             printf(" %s \n", file_name);
 
             fclose(file);
+        }
+    }
+}
+
+void read_from_stdin()
+{
+    char ch;
+    while(read(STDIN_FILENO, &ch, 1) > 0)
+    {
+        if(ch == '\n')
+        {
+            printf("%c",ch);
         }
     }
 }
@@ -316,7 +329,7 @@ long find_word_count(FILE *file, char *file_name)
 
         if(!skip)
         {
-            if(val == '\0' && (p - p_prev > 0))
+            if(val == EOF && (p - p_prev > 0))
             {
                 word_count++;
             }
